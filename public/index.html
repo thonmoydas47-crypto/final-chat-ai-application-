@@ -3,16 +3,9 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Chat</title>
-    <link
-      rel="preconnect"
-      href="https://fonts.googleapis.com"
-    />
-    <link
-      rel="preconnect"
-      href="https://fonts.gstatic.com"
-      crossorigin
-    />
+    <title>Dassai Medical AI</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -20,49 +13,44 @@
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <div class="bot-container">
-      <header class="bot-header">
-        <div class="hospital-logo">
-          <div class="logo-icon"></div>
-          <div>
-            <span>DASSAI MEDICAL</span>
-            <div style="font-size: 0.85rem; color: #94a3b8; margin-top: 4px;">Made by Thonmoy Das Aviation HS (Final AI project)</div>
-          </div>
+    <header class="main-header">
+      <div class="logo-area">
+        <span class="plus-icon">✚</span>
+        <div>
+          <h1>DASSAI MEDICAL</h1>
+          <p class="subtitle">Made by Thonmoy Das Aviation HS (Final AI project)</p>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <div class="ai-status-dot"></div>
-          <small style="color: #64748b;">AI System Active</small>
-        </div>
-      </header>
+      </div>
+      <div class="system-status">
+        <span class="status-dot"></span>
+        AI System Active
+      </div>
+    </header>
 
-      <main class="chat-window">
-        <div class="chat-messages" id="messages">
-          <div class="message message-ai">
-            <div class="message-bubble">
-              Hi! Ask me anything to get started.
-            </div>
-          </div>
+    <main class="chat-wrapper">
+      <div class="chat-stream" id="messages">
+        <div class="message ai-message is-streaming">
+          <div class="message-bubble">Hi! Ask me anything to get started.</div>
         </div>
-      </main>
+      </div>
+    </main>
 
-      <footer class="input-area">
-        <div class="input-wrapper">
-          <form class="composer" id="composer" autocomplete="off" style="display: flex; width: 100%; gap: 12px; align-items: center;">
-            <input
-              class="composer-input"
-              id="composer-input"
-              type="text"
-              placeholder="Describe your symptoms..."
-              required
-              style="flex: 1; border: none; outline: none; font-size: 16px; background: transparent;"
-            />
-            <button class="composer-send" id="composer-send" type="submit">
-              Send
-            </button>
-          </form>
-        </div>
-      </footer>
-    </div>
+    <footer class="input-container">
+      <form class="input-box-wrapper composer" id="composer" autocomplete="off">
+        <input
+          type="text"
+          placeholder="Describe your symptoms..."
+          id="composer-input"
+          class="composer-input"
+          required
+        />
+        <button class="input-send composer-send" id="composer-send" type="submit" aria-label="Send message">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor" />
+          </svg>
+        </button>
+      </form>
+    </footer>
 
     <script type="module" src="app.js"></script>
   </body>
