@@ -1,60 +1,604 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Dassai Medical AI</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="styles.css" />
-  </head>
-  <body>
-    <header class="main-header">
-      <div class="logo-area">
-        <span class="plus-icon">✚</span>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dassai Medical AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0b0f1a;
+      --surface:   #111827;
+      --surface2:  #1a2235;
+      --border:    #1f2d42;
+      --teal:      #0fd4c4;
+      --teal-dim:  #0aa898;
+      --teal-glow: rgba(15,212,196,0.15);
+      --red:       #ff5c5c;
+      --text:      #e8edf5;
+      --text-sub:  #7a8eaa;
+      --user-bg:   #0f3d4a;
+      --ai-bg:     #131e2e;
+      --radius:    14px;
+      --font-body: 'Outfit', sans-serif;
+      --font-serif:'Instrument Serif', serif;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); }
+
+    /* ── Layout ── */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px; min-width: 260px; background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      transition: transform .3s ease;
+    }
+    .sidebar-header {
+      padding: 24px 20px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 4px; }
+    .logo-icon {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: linear-gradient(135deg, var(--teal), #0a8f85);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .logo-text { font-family: var(--font-serif); font-size: 20px; letter-spacing: .5px; }
+    .logo-sub { font-size: 11px; color: var(--text-sub); margin-left: 44px; letter-spacing: 1px; text-transform: uppercase; }
+
+    .new-chat-btn {
+      margin: 16px 20px; padding: 10px 14px;
+      background: var(--teal-glow); border: 1px solid var(--teal);
+      color: var(--teal); border-radius: 8px; cursor: pointer;
+      font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      display: flex; align-items: center; gap: 8px;
+      transition: background .2s, box-shadow .2s;
+    }
+    .new-chat-btn:hover { background: rgba(15,212,196,.25); box-shadow: 0 0 12px var(--teal-glow); }
+
+    .history-label { padding: 0 20px 8px; font-size: 10px; color: var(--text-sub); letter-spacing: 1.5px; text-transform: uppercase; }
+    .history-list { flex: 1; overflow-y: auto; padding: 0 12px 12px; }
+    .history-item {
+      padding: 9px 10px; border-radius: 8px; cursor: pointer;
+      font-size: 13px; color: var(--text-sub); white-space: nowrap;
+      overflow: hidden; text-overflow: ellipsis;
+      transition: background .15s, color .15s;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .history-item:hover { background: var(--surface2); color: var(--text); }
+    .history-item.active { background: var(--surface2); color: var(--teal); }
+
+    .disclaimer {
+      margin: auto 16px 16px; padding: 10px 12px;
+      background: rgba(255,92,92,.07); border: 1px solid rgba(255,92,92,.2);
+      border-radius: 8px; font-size: 11px; color: #ff9b9b; line-height: 1.5;
+    }
+    .disclaimer strong { display: block; margin-bottom: 2px; }
+
+    /* ── Main ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Top bar */
+    .topbar {
+      padding: 14px 24px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface);
+    }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .menu-btn { display: none; background: none; border: none; color: var(--text-sub); cursor: pointer; font-size: 20px; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 8px var(--teal); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
+    .topbar-title { font-size: 15px; font-weight: 500; }
+    .topbar-sub { font-size: 12px; color: var(--text-sub); }
+    .clear-btn {
+      padding: 7px 14px; background: none; border: 1px solid var(--border);
+      color: var(--text-sub); border-radius: 7px; cursor: pointer;
+      font-family: var(--font-body); font-size: 12px;
+      transition: border-color .2s, color .2s;
+    }
+    .clear-btn:hover { border-color: var(--red); color: var(--red); }
+
+    /* Chat area */
+    .chat-area { flex: 1; overflow-y: auto; padding: 28px 24px; scroll-behavior: smooth; }
+    .chat-area::-webkit-scrollbar { width: 5px; }
+    .chat-area::-webkit-scrollbar-track { background: transparent; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* Welcome */
+    .welcome {
+      text-align: center; padding: 60px 20px 40px;
+      animation: fadeUp .6s ease both;
+    }
+    .welcome-icon {
+      width: 70px; height: 70px; border-radius: 18px;
+      background: linear-gradient(135deg, var(--teal), #0a8f85);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; margin: 0 auto 20px;
+      box-shadow: 0 8px 32px rgba(15,212,196,.3);
+    }
+    .welcome h1 { font-family: var(--font-serif); font-size: 32px; margin-bottom: 8px; }
+    .welcome p { color: var(--text-sub); font-size: 15px; max-width: 380px; margin: 0 auto 32px; line-height: 1.6; }
+
+    .prompt-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 560px; margin: 0 auto; }
+    .prompt-card {
+      padding: 14px 16px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      cursor: pointer; text-align: left;
+      transition: border-color .2s, background .2s, transform .15s;
+      animation: fadeUp .5s ease both;
+    }
+    .prompt-card:hover { border-color: var(--teal); background: var(--teal-glow); transform: translateY(-2px); }
+    .prompt-card .card-icon { font-size: 20px; margin-bottom: 6px; }
+    .prompt-card .card-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+    .prompt-card .card-desc { font-size: 11px; color: var(--text-sub); line-height: 1.4; }
+
+    /* Messages */
+    .message { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeUp .3s ease both; }
+    .message.user { flex-direction: row-reverse; }
+    .avatar {
+      width: 34px; height: 34px; border-radius: 9px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 16px;
+    }
+    .ai-avatar { background: linear-gradient(135deg, var(--teal), #0a8f85); box-shadow: 0 4px 12px rgba(15,212,196,.2); }
+    .user-avatar { background: var(--surface2); border: 1px solid var(--border); }
+
+    .msg-wrap { max-width: 72%; display: flex; flex-direction: column; gap: 4px; }
+    .message.user .msg-wrap { align-items: flex-end; }
+    .msg-bubble {
+      padding: 13px 16px; border-radius: var(--radius);
+      font-size: 14px; line-height: 1.65;
+    }
+    .ai-bubble { background: var(--ai-bg); border: 1px solid var(--border); border-top-left-radius: 4px; }
+    .user-bubble { background: var(--user-bg); border: 1px solid rgba(15,212,196,.2); border-top-right-radius: 4px; }
+    .msg-meta { display: flex; align-items: center; gap: 8px; }
+    .msg-time { font-size: 10px; color: var(--text-sub); }
+    .copy-btn {
+      background: none; border: none; color: var(--text-sub); cursor: pointer;
+      font-size: 11px; padding: 2px 6px; border-radius: 4px;
+      transition: background .15s, color .15s; opacity: 0;
+    }
+    .message:hover .copy-btn { opacity: 1; }
+    .copy-btn:hover { background: var(--surface2); color: var(--teal); }
+
+    /* Typing indicator */
+    .typing-dots { display: flex; gap: 5px; padding: 16px 18px; }
+    .typing-dots span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--teal); opacity: .4;
+      animation: blink 1.2s infinite;
+    }
+    .typing-dots span:nth-child(2) { animation-delay: .2s; }
+    .typing-dots span:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink { 0%,80%,100%{opacity:.2;transform:scale(1)} 40%{opacity:1;transform:scale(1.2)} }
+
+    /* Input area */
+    .input-area {
+      padding: 16px 24px 20px;
+      border-top: 1px solid var(--border);
+      background: var(--surface);
+    }
+    .input-row {
+      display: flex; gap: 10px; align-items: flex-end;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 12px; padding: 10px 12px;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .input-row:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px var(--teal-glow); }
+    #user-input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text); font-family: var(--font-body); font-size: 14px;
+      resize: none; max-height: 140px; line-height: 1.5;
+    }
+    #user-input::placeholder { color: var(--text-sub); }
+    .send-btn {
+      width: 36px; height: 36px; border-radius: 8px; flex-shrink: 0;
+      background: var(--teal); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s, transform .15s, box-shadow .2s;
+    }
+    .send-btn:hover { background: var(--teal-dim); transform: scale(1.05); box-shadow: 0 4px 14px rgba(15,212,196,.3); }
+    .send-btn:disabled { background: var(--border); cursor: not-allowed; transform: none; box-shadow: none; }
+    .send-btn svg { width: 16px; height: 16px; fill: #000; }
+
+    .input-footer { display: flex; justify-content: space-between; margin-top: 8px; padding: 0 2px; }
+    .input-hint { font-size: 11px; color: var(--text-sub); }
+    #char-count { font-size: 11px; color: var(--text-sub); }
+    #char-count.warn { color: var(--red); }
+
+    /* Animations */
+    @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+
+    /* Mobile */
+    @media (max-width: 700px) {
+      .sidebar { position: fixed; left: 0; top: 0; height: 100%; z-index: 100; transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .menu-btn { display: block; }
+      .topbar { padding: 12px 16px; }
+      .chat-area { padding: 20px 14px; }
+      .input-area { padding: 12px 14px 16px; }
+      .prompt-grid { grid-template-columns: 1fr; }
+      .msg-wrap { max-width: 88%; }
+    }
+
+    /* Overlay */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99; }
+    .overlay.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <div class="logo-icon">✚</div>
+        <span class="logo-text">Dassai</span>
+      </div>
+      <div class="logo-sub">Medical AI</div>
+    </div>
+
+    <button class="new-chat-btn" onclick="newChat()">
+      <span>＋</span> New Conversation
+    </button>
+
+    <div class="history-label">Recent</div>
+    <div class="history-list" id="history-list"></div>
+
+    <div class="disclaimer">
+      <strong>⚠ Medical Disclaimer</strong>
+      This AI is for informational purposes only and does not replace professional medical advice. Always consult a qualified healthcare provider.
+    </div>
+  </aside>
+
+  <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+        <div class="status-dot"></div>
         <div>
-          <h1>DASSAI MEDICAL</h1>
-          <p class="subtitle">Made by Thonmoy Das Aviation HS (Final AI project)</p>
+          <div class="topbar-title">Dassai Medical AI</div>
+          <div class="topbar-sub">AI System Active · By Thonmoy Das</div>
         </div>
       </div>
-      <div class="system-status">
-        <span class="status-dot"></span>
-        AI System Active
-      </div>
-    </header>
+      <button class="clear-btn" onclick="clearChat()">🗑 Clear Chat</button>
+    </div>
 
-    <main class="chat-wrapper">
-      <div class="chat-stream" id="messages">
-        <div class="message ai-message is-streaming">
-          <div class="message-content">Hi! Ask me anything to get started.</div>
+    <div class="chat-area" id="chat-area">
+      <div class="welcome" id="welcome">
+        <div class="welcome-icon">✚</div>
+        <h1>Dassai Medical AI</h1>
+        <p>Your intelligent medical companion. Ask about symptoms, first aid, medications, or general wellness.</p>
+        <div class="prompt-grid">
+          <div class="prompt-card" style="animation-delay:.1s" onclick="sendPrompt('What are effective ways to manage chronic back pain?')">
+            <div class="card-icon">🦴</div>
+            <div class="card-title">Managing Back Pain</div>
+            <div class="card-desc">Tips for chronic & acute relief</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.15s" onclick="sendPrompt('I have a persistent headache. What could be causing it and what should I do?')">
+            <div class="card-icon">🧠</div>
+            <div class="card-title">Headache Checker</div>
+            <div class="card-desc">Understand possible causes</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.2s" onclick="sendPrompt('What are the best practices for healthy sleep?')">
+            <div class="card-icon">🌙</div>
+            <div class="card-title">Sleep Health</div>
+            <div class="card-desc">Improve sleep quality</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.25s" onclick="sendPrompt('What is the correct first aid procedure for a burn injury?')">
+            <div class="card-icon">🩹</div>
+            <div class="card-title">First Aid: Burns</div>
+            <div class="card-desc">Immediate care steps</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.3s" onclick="sendPrompt('What are common signs and symptoms of dehydration?')">
+            <div class="card-icon">💧</div>
+            <div class="card-title">Dehydration Signs</div>
+            <div class="card-desc">Know when to drink more</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.35s" onclick="sendPrompt('What foods should I eat to boost my immune system?')">
+            <div class="card-icon">🥦</div>
+            <div class="card-title">Immune Boosters</div>
+            <div class="card-desc">Nutrition for immunity</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.4s" onclick="sendPrompt('How do I know if I am having an allergic reaction and what should I do?')">
+            <div class="card-icon">⚠️</div>
+            <div class="card-title">Allergic Reactions</div>
+            <div class="card-desc">Identify & respond quickly</div>
+          </div>
+          <div class="prompt-card" style="animation-delay:.45s" onclick="sendPrompt('What are normal healthy ranges for blood pressure?')">
+            <div class="card-icon">❤️</div>
+            <div class="card-title">Blood Pressure</div>
+            <div class="card-desc">Healthy ranges explained</div>
+          </div>
         </div>
       </div>
-    </main>
+    </div>
 
-    <footer class="bottom-container">
-      <div class="suggestions-wrapper">
-        <button class="chip" onclick="useSuggestion('Managing Back Pain')">🏥 Managing Back Pain</button>
-        <button class="chip" onclick="useSuggestion('Symptom Checker for Headaches')">🏢 Symptom Checker for Headaches</button>
-        <button class="chip" onclick="useSuggestion('Healthy Sleep Practices')">🌙 Healthy Sleep Practices</button>
-        <button class="chip" onclick="useSuggestion('First Aid for Burns')">🖐🏻 First Aid for Burns</button>
+    <div class="input-area">
+      <div class="input-row">
+        <textarea id="user-input" rows="1" placeholder="Ask a medical question…" maxlength="1000"
+          oninput="autoResize(this); updateCharCount()" onkeydown="handleKey(event)"></textarea>
+        <button class="send-btn" id="send-btn" onclick="sendMessage()">
+          <svg viewBox="0 0 24 24"><path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/></svg>
+        </button>
       </div>
+      <div class="input-footer">
+        <span class="input-hint">Enter to send · Shift+Enter for new line</span>
+        <span id="char-count">0 / 1000</span>
+      </div>
+    </div>
+  </main>
+</div>
 
-      <form class="input-box-wrapper composer" id="composer" autocomplete="off">
-        <input
-          type="text"
-          placeholder="Describe your symptoms..."
-          id="composer-input"
-          class="composer-input"
-          required
-        />
-        <button class="input-send composer-send" id="composer-send" type="submit">Send</button>
-      </form>
-    </footer>
+<script>
+  // ── CONFIG ──────────────────────────────────────────────
+  // IMPORTANT: Replace this with your actual Anthropic API key.
+  // For production/GitHub, store this as a Vercel/Netlify environment
+  // variable and use a backend proxy — never expose keys in public repos.
+  const API_KEY = "YOUR_API_KEY_HERE";
 
-    <script type="module" src="app.js"></script>
-  </body>
+  const SYSTEM_PROMPT = `You are Dassai Medical AI, a knowledgeable and compassionate medical information assistant created for educational purposes. You help users understand medical topics, symptoms, first aid, medications, and wellness.
+
+Guidelines:
+- Provide clear, accurate, helpful medical information in a warm and professional tone.
+- Always recommend consulting a qualified healthcare professional for diagnosis or treatment.
+- For emergencies (chest pain, difficulty breathing, severe bleeding, etc.), immediately tell the user to call emergency services (911 in the US).
+- Use simple language but be medically accurate.
+- Structure longer answers with clear sections when helpful.
+- Never diagnose conditions definitively — only provide possibilities and guidance.
+- Be empathetic; the user may be worried about their health.`;
+
+  // ── STATE ───────────────────────────────────────────────
+  let messages = [];
+  let sessions = JSON.parse(localStorage.getItem('dassai_sessions') || '[]');
+  let currentSessionId = null;
+
+  // ── INIT ────────────────────────────────────────────────
+  renderHistory();
+
+  // ── SIDEBAR ─────────────────────────────────────────────
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('show');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('show');
+  }
+
+  // ── CHAT HISTORY ─────────────────────────────────────────
+  function renderHistory() {
+    const list = document.getElementById('history-list');
+    list.innerHTML = sessions.length === 0
+      ? '<div style="padding:8px 10px;font-size:12px;color:var(--text-sub)">No past conversations</div>'
+      : sessions.slice().reverse().map(s => `
+          <div class="history-item ${s.id === currentSessionId ? 'active' : ''}"
+               onclick="loadSession('${s.id}')">
+            💬 ${escHtml(s.title)}
+          </div>`).join('');
+  }
+
+  function saveSession() {
+    if (!messages.length) return;
+    const title = messages[0].content.slice(0, 40) + (messages[0].content.length > 40 ? '…' : '');
+    const idx = sessions.findIndex(s => s.id === currentSessionId);
+    if (idx >= 0) {
+      sessions[idx] = { id: currentSessionId, title, messages };
+    } else {
+      sessions.push({ id: currentSessionId, title, messages });
+    }
+    localStorage.setItem('dassai_sessions', JSON.stringify(sessions));
+    renderHistory();
+  }
+
+  function loadSession(id) {
+    const s = sessions.find(s => s.id === id);
+    if (!s) return;
+    currentSessionId = id;
+    messages = s.messages;
+    const area = document.getElementById('chat-area');
+    area.innerHTML = '';
+    messages.forEach(m => appendBubble(m.role, m.content, false));
+    renderHistory();
+    closeSidebar();
+    scrollBottom();
+  }
+
+  function newChat() {
+    messages = [];
+    currentSessionId = Date.now().toString();
+    const area = document.getElementById('chat-area');
+    area.innerHTML = '';
+    area.appendChild(buildWelcome());
+    renderHistory();
+    closeSidebar();
+  }
+
+  function buildWelcome() {
+    const el = document.createElement('div');
+    el.id = 'welcome';
+    el.className = 'welcome';
+    el.innerHTML = document.querySelector('.welcome').innerHTML;
+    return el;
+  }
+
+  // ── SEND ────────────────────────────────────────────────
+  async function sendMessage() {
+    const input = document.getElementById('user-input');
+    const text = input.value.trim();
+    if (!text || document.getElementById('send-btn').disabled) return;
+
+    // Remove welcome screen
+    const welcome = document.getElementById('welcome');
+    if (welcome) welcome.remove();
+
+    if (!currentSessionId) currentSessionId = Date.now().toString();
+
+    input.value = '';
+    autoResize(input);
+    updateCharCount();
+
+    messages.push({ role: 'user', content: text });
+    appendBubble('user', text);
+    scrollBottom();
+
+    // Disable input
+    document.getElementById('send-btn').disabled = true;
+
+    // Typing indicator
+    const typingEl = appendTyping();
+    scrollBottom();
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': API_KEY,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: SYSTEM_PROMPT,
+          messages: messages
+        })
+      });
+
+      const data = await res.json();
+      typingEl.remove();
+
+      if (data.content && data.content[0]) {
+        const reply = data.content[0].text;
+        messages.push({ role: 'assistant', content: reply });
+        appendBubble('assistant', reply);
+        saveSession();
+      } else {
+        appendBubble('assistant', '⚠️ I couldn\'t get a response. Please check your API key and try again.');
+      }
+    } catch (err) {
+      typingEl.remove();
+      appendBubble('assistant', '⚠️ Network error. Please check your connection and try again.');
+    }
+
+    document.getElementById('send-btn').disabled = false;
+    scrollBottom();
+  }
+
+  function sendPrompt(text) {
+    document.getElementById('user-input').value = text;
+    updateCharCount();
+    sendMessage();
+  }
+
+  // ── DOM HELPERS ─────────────────────────────────────────
+  function appendBubble(role, text, animate = true) {
+    const area = document.getElementById('chat-area');
+    const isAI = role !== 'user';
+    const now = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+    const msg = document.createElement('div');
+    msg.className = `message ${isAI ? 'ai' : 'user'}`;
+    if (!animate) msg.style.animation = 'none';
+
+    msg.innerHTML = `
+      <div class="avatar ${isAI ? 'ai-avatar' : 'user-avatar'}">${isAI ? '✚' : '👤'}</div>
+      <div class="msg-wrap">
+        <div class="msg-bubble ${isAI ? 'ai-bubble' : 'user-bubble'}">${formatText(text)}</div>
+        <div class="msg-meta">
+          <span class="msg-time">${now}</span>
+          ${isAI ? `<button class="copy-btn" onclick="copyText(this, \`${escAttr(text)}\`)">⎘ Copy</button>` : ''}
+        </div>
+      </div>`;
+
+    area.appendChild(msg);
+    return msg;
+  }
+
+  function appendTyping() {
+    const area = document.getElementById('chat-area');
+    const el = document.createElement('div');
+    el.className = 'message ai';
+    el.innerHTML = `
+      <div class="avatar ai-avatar">✚</div>
+      <div class="msg-wrap">
+        <div class="msg-bubble ai-bubble">
+          <div class="typing-dots"><span></span><span></span><span></span></div>
+        </div>
+      </div>`;
+    area.appendChild(el);
+    return el;
+  }
+
+  function formatText(text) {
+    return escHtml(text)
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/\n/g, '<br>');
+  }
+
+  function escHtml(t) {
+    return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function escAttr(t) {
+    return t.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
+  }
+
+  function copyText(btn, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied';
+      setTimeout(() => btn.textContent = '⎘ Copy', 2000);
+    });
+  }
+
+  function clearChat() {
+    if (!confirm('Clear this conversation?')) return;
+    messages = [];
+    currentSessionId = null;
+    const area = document.getElementById('chat-area');
+    area.innerHTML = '';
+    const welcome = document.createElement('div');
+    welcome.className = 'welcome';
+    welcome.id = 'welcome';
+    welcome.innerHTML = document.createElement('div').innerHTML; // rebuild
+    location.reload(); // simplest reset
+  }
+
+  function scrollBottom() {
+    const area = document.getElementById('chat-area');
+    setTimeout(() => area.scrollTop = area.scrollHeight, 50);
+  }
+
+  // ── INPUT HELPERS ────────────────────────────────────────
+  function autoResize(el) {
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight, 140) + 'px';
+  }
+
+  function updateCharCount() {
+    const val = document.getElementById('user-input').value.length;
+    const el = document.getElementById('char-count');
+    el.textContent = `${val} / 1000`;
+    el.className = val > 800 ? 'warn' : '';
+  }
+
+  function handleKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+</script>
+</body>
 </html>
