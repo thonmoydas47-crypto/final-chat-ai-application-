@@ -28,10 +28,8 @@
 
     html, body { height: 100%; background: var(--bg); color: var(--text); font-family: var(--font-body); }
 
-    /* ── Layout ── */
     .app { display: flex; height: 100vh; overflow: hidden; }
 
-    /* ── Sidebar ── */
     .sidebar {
       width: 260px; min-width: 260px; background: var(--surface);
       border-right: 1px solid var(--border);
@@ -81,10 +79,8 @@
     }
     .disclaimer strong { display: block; margin-bottom: 2px; }
 
-    /* ── Main ── */
     .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    /* Top bar */
     .topbar {
       padding: 14px 24px; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
@@ -104,13 +100,11 @@
     }
     .clear-btn:hover { border-color: var(--red); color: var(--red); }
 
-    /* Chat area */
     .chat-area { flex: 1; overflow-y: auto; padding: 28px 24px; scroll-behavior: smooth; }
     .chat-area::-webkit-scrollbar { width: 5px; }
     .chat-area::-webkit-scrollbar-track { background: transparent; }
     .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* Welcome */
     .welcome {
       text-align: center; padding: 60px 20px 40px;
       animation: fadeUp .6s ease both;
@@ -138,7 +132,6 @@
     .prompt-card .card-title { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
     .prompt-card .card-desc { font-size: 11px; color: var(--text-sub); line-height: 1.4; }
 
-    /* Messages */
     .message { display: flex; gap: 12px; margin-bottom: 20px; animation: fadeUp .3s ease both; }
     .message.user { flex-direction: row-reverse; }
     .avatar {
@@ -166,7 +159,6 @@
     .message:hover .copy-btn { opacity: 1; }
     .copy-btn:hover { background: var(--surface2); color: var(--teal); }
 
-    /* Typing indicator */
     .typing-dots { display: flex; gap: 5px; padding: 16px 18px; }
     .typing-dots span {
       width: 7px; height: 7px; border-radius: 50%;
@@ -177,7 +169,6 @@
     .typing-dots span:nth-child(3) { animation-delay: .4s; }
     @keyframes blink { 0%,80%,100%{opacity:.2;transform:scale(1)} 40%{opacity:1;transform:scale(1.2)} }
 
-    /* Input area */
     .input-area {
       padding: 16px 24px 20px;
       border-top: 1px solid var(--border);
@@ -211,10 +202,8 @@
     #char-count { font-size: 11px; color: var(--text-sub); }
     #char-count.warn { color: var(--red); }
 
-    /* Animations */
     @keyframes fadeUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
 
-    /* Mobile */
     @media (max-width: 700px) {
       .sidebar { position: fixed; left: 0; top: 0; height: 100%; z-index: 100; transform: translateX(-100%); }
       .sidebar.open { transform: translateX(0); }
@@ -226,7 +215,6 @@
       .msg-wrap { max-width: 88%; }
     }
 
-    /* Overlay */
     .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 99; }
     .overlay.show { display: block; }
   </style>
@@ -235,7 +223,6 @@
 
 <div class="app">
 
-  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
@@ -260,7 +247,6 @@
 
   <div class="overlay" id="overlay" onclick="closeSidebar()"></div>
 
-  <!-- Main -->
   <main class="main">
     <div class="topbar">
       <div class="topbar-left">
@@ -341,12 +327,6 @@
 </div>
 
 <script>
-  // ── CONFIG ──────────────────────────────────────────────
-  // IMPORTANT: Replace this with your actual Anthropic API key.
-  // For production/GitHub, store this as a Vercel/Netlify environment
-  // variable and use a backend proxy — never expose keys in public repos.
-  const API_KEY = "YOUR_API_KEY_HERE";
-
   const SYSTEM_PROMPT = `You are Dassai Medical AI, a knowledgeable and compassionate medical information assistant created for educational purposes. You help users understand medical topics, symptoms, first aid, medications, and wellness.
 
 Guidelines:
@@ -358,25 +338,22 @@ Guidelines:
 - Never diagnose conditions definitively — only provide possibilities and guidance.
 - Be empathetic; the user may be worried about their health.`;
 
-  // ── STATE ───────────────────────────────────────────────
   let messages = [];
   let sessions = JSON.parse(localStorage.getItem('dassai_sessions') || '[]');
   let currentSessionId = null;
 
-  // ── INIT ────────────────────────────────────────────────
   renderHistory();
 
-  // ── SIDEBAR ─────────────────────────────────────────────
   function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('open');
     document.getElementById('overlay').classList.toggle('show');
   }
+
   function closeSidebar() {
     document.getElementById('sidebar').classList.remove('open');
     document.getElementById('overlay').classList.remove('show');
   }
 
-  // ── CHAT HISTORY ─────────────────────────────────────────
   function renderHistory() {
     const list = document.getElementById('history-list');
     list.innerHTML = sessions.length === 0
@@ -432,13 +409,11 @@ Guidelines:
     return el;
   }
 
-  // ── SEND ────────────────────────────────────────────────
   async function sendMessage() {
     const input = document.getElementById('user-input');
     const text = input.value.trim();
     if (!text || document.getElementById('send-btn').disabled) return;
 
-    // Remove welcome screen
     const welcome = document.getElementById('welcome');
     if (welcome) welcome.remove();
 
@@ -452,48 +427,51 @@ Guidelines:
     appendBubble('user', text);
     scrollBottom();
 
-    // Disable input
-    document.getElementById('send-btn').disabled = true;
+    const sendButton = document.getElementById('send-btn');
+    sendButton.disabled = true;
 
-    // Typing indicator
     const typingEl = appendTyping();
+    const typingBubble = typingEl.querySelector('.msg-bubble');
     scrollBottom();
 
     try {
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/chat', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-api-key': API_KEY,
-          'anthropic-version': '2023-06-01',
-          'anthropic-dangerous-direct-browser-access': 'true'
-        },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 1000,
-          system: SYSTEM_PROMPT,
-          messages: messages
-        })
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: messages.map(m => ({ role: m.role, text: m.content })) }),
       });
 
-      const data = await res.json();
-      typingEl.remove();
-
-      if (data.content && data.content[0]) {
-        const reply = data.content[0].text;
-        messages.push({ role: 'assistant', content: reply });
-        appendBubble('assistant', reply);
-        saveSession();
-      } else {
-        appendBubble('assistant', '⚠️ I couldn\'t get a response. Please check your API key and try again.');
+      if (!response.ok || !response.body) {
+        const errText = await response.text().catch(() => '');
+        throw new Error(errText || `Request failed (${response.status})`);
       }
+
+      let assistantText = '';
+      for await (const eventData of readSseStream(response.body)) {
+        if (eventData === '[DONE]') break;
+        let payload;
+        try {
+          payload = JSON.parse(eventData);
+        } catch {
+          continue;
+        }
+        if (payload.error) throw new Error(payload.error);
+        if (payload.text) {
+          assistantText += payload.text;
+          typingBubble.innerHTML = formatText(assistantText);
+          scrollBottom();
+        }
+      }
+
+      messages.push({ role: 'assistant', content: assistantText.trim() });
+      saveSession();
     } catch (err) {
       typingEl.remove();
-      appendBubble('assistant', '⚠️ Network error. Please check your connection and try again.');
+      appendBubble('assistant', `⚠️ ${err.message}`);
+    } finally {
+      sendButton.disabled = false;
+      scrollBottom();
     }
-
-    document.getElementById('send-btn').disabled = false;
-    scrollBottom();
   }
 
   function sendPrompt(text) {
@@ -502,7 +480,6 @@ Guidelines:
     sendMessage();
   }
 
-  // ── DOM HELPERS ─────────────────────────────────────────
   function appendBubble(role, text, animate = true) {
     const area = document.getElementById('chat-area');
     const isAI = role !== 'user';
@@ -551,6 +528,7 @@ Guidelines:
   function escHtml(t) {
     return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
   function escAttr(t) {
     return t.replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/\$/g,'\\$');
   }
@@ -568,11 +546,8 @@ Guidelines:
     currentSessionId = null;
     const area = document.getElementById('chat-area');
     area.innerHTML = '';
-    const welcome = document.createElement('div');
-    welcome.className = 'welcome';
-    welcome.id = 'welcome';
-    welcome.innerHTML = document.createElement('div').innerHTML; // rebuild
-    location.reload(); // simplest reset
+    area.appendChild(buildWelcome());
+    renderHistory();
   }
 
   function scrollBottom() {
@@ -580,7 +555,6 @@ Guidelines:
     setTimeout(() => area.scrollTop = area.scrollHeight, 50);
   }
 
-  // ── INPUT HELPERS ────────────────────────────────────────
   function autoResize(el) {
     el.style.height = 'auto';
     el.style.height = Math.min(el.scrollHeight, 140) + 'px';
@@ -597,6 +571,26 @@ Guidelines:
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
+    }
+  }
+
+  async function* readSseStream(body) {
+    const reader = body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      buffer += decoder.decode(value, { stream: true });
+
+      let sep;
+      while ((sep = buffer.indexOf('\n\n')) !== -1) {
+        const frame = buffer.slice(0, sep);
+        buffer = buffer.slice(sep + 2);
+        const dataLine = frame.split('\n').find((l) => l.startsWith('data: '));
+        if (dataLine) yield dataLine.slice(6);
+      }
     }
   }
 </script>
