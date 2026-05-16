@@ -1,4 +1,4 @@
-/* Base Resets & Global Styles */
+/* Clean Base Background (No Grids) */
 * {
   margin: 0;
   padding: 0;
@@ -11,23 +11,12 @@ body {
 }
 
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  background: linear-gradient(135deg, #eef7fc 0%, #e0f0f9 100%);
-  color: #1e293b;
-  overflow-x: hidden;
-  position: relative;
-}
-
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    linear-gradient(rgba(2, 82, 155, 0.04) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(2, 82, 155, 0.04) 1px, transparent 1px);
-  background-size: 36px 36px;
-  pointer-events: none;
-  z-index: 0;
+  background-color: #e3f2fd;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  color: #102a43;
 }
 
 button,
@@ -37,25 +26,21 @@ input {
 
 button {
   border: none;
+  background: transparent;
 }
 
-img {
-  max-width: 100%;
-  display: block;
-}
-
-/* 1. Clean Top Header */
+/* Clean Top Header */
 .main-header {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  padding: 20px 32px;
+  padding: 20px 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(14px);
+  backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
   z-index: 10;
 }
@@ -67,23 +52,22 @@ img {
 }
 
 .plus-icon {
+  width: 38px;
+  height: 38px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 38px;
-  height: 38px;
   border-radius: 14px;
   background: #eaf5ff;
   color: #007aff;
   font-size: 1.2rem;
-  box-shadow: 0 21px 50px rgba(0, 122, 255, 0.08);
+  box-shadow: 0 20px 50px rgba(0, 122, 255, 0.08);
 }
 
 .logo-area h1 {
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: 0.5px;
-  color: #102a43;
 }
 
 .subtitle {
@@ -111,22 +95,18 @@ img {
   animation: pulse 2.2s infinite ease-in-out;
 }
 
-/* 2. Chat Layout Wrapper */
+/* Chat Layout Mechanics */
 .chat-wrapper {
   width: 100%;
-  max-width: 800px;
-  margin: 108px auto 130px auto;
+  max-width: 850px;
+  margin: 104px auto 160px auto;
   padding: 0 20px;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 1;
 }
 
 .chat-stream {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 }
 
 .message {
@@ -138,49 +118,80 @@ img {
   justify-content: flex-start;
 }
 
+.ai-message .message-content {
+  background: #ffffff;
+  color: #2c3e50;
+  border-radius: 18px;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
 .user-message {
   justify-content: flex-end;
 }
 
-.message-bubble {
-  max-width: 78%;
-  padding: 18px 22px;
-  border-radius: 26px;
-  border-bottom-left-radius: 6px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #14213d;
-  font-size: 0.95rem;
-  line-height: 1.7;
-  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  position: relative;
-  overflow: hidden;
-}
-
-.user-message .message-bubble {
-  background: #007aff;
+.user-message .message-content {
+  background: linear-gradient(180deg, #2693ff 0%, #007aff 100%);
   color: #ffffff;
-  border-radius: 26px;
-  border-bottom-right-radius: 6px;
+  border-radius: 18px;
+  border-bottom-right-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.15);
 }
 
-.is-streaming .message-bubble::after {
+.message-content {
+  padding: 14px 20px;
+  max-width: 70%;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.is-streaming .message-content::after {
   content: " ▎";
   color: #007aff;
   animation: blink 0.8s steps(2, start) infinite;
 }
 
-/* 4. Beautiful Centered Fixed Bottom Input Box */
-.input-container {
+/* Bottom Container for Input + Chips */
+.bottom-container {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
-  padding: 28px 22px 30px;
-  background: linear-gradient(to top, rgba(224, 240, 249, 0.96), transparent 55%);
+  padding: 20px;
+  background: linear-gradient(to top, #e3f2fd 80%, transparent);
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   z-index: 10;
+}
+
+.suggestions-wrapper {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 800px;
+  width: 100%;
+}
+
+.chip {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 122, 255, 0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.88rem;
+  color: #0056b3;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(4px);
+}
+
+.chip:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 122, 255, 0.1);
+  border-color: #007aff;
 }
 
 .input-box-wrapper {
@@ -189,11 +200,11 @@ img {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 18px;
+  padding: 14px 18px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.94);
+  background: #ffffff;
+  border: 1px solid rgba(0, 122, 255, 0.14);
   box-shadow: 0 22px 70px rgba(2, 55, 121, 0.09);
-  border: 1px solid rgba(15, 23, 42, 0.08);
 }
 
 .input-box-wrapper:focus-within {
@@ -227,6 +238,7 @@ img {
   cursor: pointer;
   transition: transform 0.15s ease, background 0.15s ease;
   box-shadow: 0 12px 24px rgba(0, 122, 255, 0.22);
+  font-weight: 700;
 }
 
 .input-send:hover {
@@ -234,18 +246,12 @@ img {
   background: #0063cc;
 }
 
-.input-send svg {
-  width: 18px;
-  height: 18px;
-}
-
-.composer-send:disabled {
+.input-send:disabled {
   opacity: 0.55;
   cursor: not-allowed;
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
   50% { opacity: 0; }
 }
 

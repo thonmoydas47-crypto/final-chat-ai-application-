@@ -30,12 +30,19 @@
     <main class="chat-wrapper">
       <div class="chat-stream" id="messages">
         <div class="message ai-message is-streaming">
-          <div class="message-bubble">Hi! Ask me anything to get started.</div>
+          <div class="message-content">Hi! Ask me anything to get started.</div>
         </div>
       </div>
     </main>
 
-    <footer class="input-container">
+    <footer class="bottom-container">
+      <div class="suggestions-wrapper">
+        <button class="chip" onclick="useSuggestion('Managing Back Pain')">🏥 Managing Back Pain</button>
+        <button class="chip" onclick="useSuggestion('Symptom Checker for Headaches')">🏢 Symptom Checker for Headaches</button>
+        <button class="chip" onclick="useSuggestion('Healthy Sleep Practices')">🌙 Healthy Sleep Practices</button>
+        <button class="chip" onclick="useSuggestion('First Aid for Burns')">🖐🏻 First Aid for Burns</button>
+      </div>
+
       <form class="input-box-wrapper composer" id="composer" autocomplete="off">
         <input
           type="text"
@@ -44,11 +51,7 @@
           class="composer-input"
           required
         />
-        <button class="input-send composer-send" id="composer-send" type="submit" aria-label="Send message">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 21L23 12L2 3V10L17 12L2 14V21Z" fill="currentColor" />
-          </svg>
-        </button>
+        <button class="input-send composer-send" id="composer-send" type="submit">Send</button>
       </form>
     </footer>
 
